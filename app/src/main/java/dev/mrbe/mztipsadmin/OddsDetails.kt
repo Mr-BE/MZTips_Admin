@@ -3,69 +3,49 @@ package dev.mrbe.mztipsadmin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.*
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import dev.mrbe.mztips.data.OddsRepo
-import dev.mrbe.mztips.data.OddsViewModel
-import dev.mrbe.mztips.data.OddsViewModelFactory
-import dev.mrbe.mztipsadmin.nav.NavRoutes
 import dev.mrbe.mztipsadmin.ui.theme.MZTipsAdminTheme
 
-class ComposeActivity : AppCompatActivity() {
+class OddsDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MZTipsAdminTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-//na
-                    //set
-                    val navController = rememberNavController()
-
-                   NavHost(navController = navController,
-                       startDestination =NavRoutes.OddsList.route,){
-                       //home screen (Odds List)
-                       composable(NavRoutes.OddsList.route){
-                           HomeContent(navController = navController)
-                       }
-                       composable(NavRoutes.AddOdds.route){
-                           AddOddsActivity().AddOddsContent()
-                       }
-                   }
-
-                    }
+//                    Greeting("Android")
+//                    FloatingActionButton(onClick = { /*TODO*/ }) {
+                    OddsDetailsContent()
                 }
             }
         }
     }
+}
 
 
 @Composable
-fun HomeContent(
-    oddsViewModel: OddsViewModel = viewModel(
-        factory = OddsViewModelFactory(OddsRepo())
-    ), navController: NavController
-) {
+fun OddsDetailsContent() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.odds_list)) }, backgroundColor = colorResource(id = R.color.orange_500))
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(NavRoutes.AddOdds.route) },
+                onClick = { /*TODO*/ },
                 backgroundColor = colorResource(id = R.color.button_background),
                 content = {
                     Icon(
@@ -86,18 +66,3 @@ fun HomeContent(
         }
     )
 }
-////Ext. fun. for navigating with just route and bundle
-//private fun NavController.navigate(
-//    route: String,
-//    args: Bundle?,
-//    navOptions: NavOptions? = null,
-//    navigatorExtras: Navigator.Extras? = null
-//) {
-//    val routeLink = NavDeepLinkRequest
-//        .Builder
-//        .fromUri(NavDestination.createRoute(route).toUri())
-//        .build()
-//
-//
-//        navigate(route, navOptions, navigatorExtras)
-//}

@@ -11,4 +11,5 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_compose">ComposeActivity</string>
     <string name="odds_list">Odds List</string>
+    <string name="add_odds">Add Odds</string>
 </resources>
