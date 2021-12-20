@@ -1,7 +1,9 @@
 package dev.mrbe.mztipsadmin
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.border
@@ -13,14 +15,20 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import com.google.android.material.datepicker.MaterialDatePicker
+import dev.mrbe.mztipsadmin.data.OddsViewModel
+import dev.mrbe.mztipsadmin.nav.NavRoutes
 import dev.mrbe.mztipsadmin.ui.theme.MZTipsAdminTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,22 +36,32 @@ import java.util.*
 class AddOddsActivity : AppCompatActivity() {
     private var inputOddsText: String? = ""
     private var inputDateText: String? = ""
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MZTipsAdminTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    AddOddsContent()
-                }
-            }
-        }
-    }
+    private var clickValue: Int? = -1
+
+    private lateinit var viewModel: OddsViewModel
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//        viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(
+//            this.application
+//        ).create(OddsViewModel::class.java)
+//        setContent {
+//            MZTipsAdminTheme {
+//                // A surface container using the 'background' color from the theme
+//                Surface(color = MaterialTheme.colors.background) {
+////                    AddOddsContent()
+//                }
+//            }
+//        }
+//    }
 
 
     @Composable
-    fun AddOddsContent() {
+    fun AddOddsContent(viewModel: OddsViewModel, navController: NavController,
+    context: Context) {
         Scaffold(
+
             topBar = {
                 TopAppBar(
                     title = { Text(stringResource(R.string.add_odds)) },
@@ -51,9 +69,19 @@ class AddOddsActivity : AppCompatActivity() {
                 )
             },
             floatingActionButton = {
+
                 FloatingActionButton(
                     onClick = {
-                        Log.i("TAG", "Saved data are -> $inputOddsText and $inputDateText")
+                        if (!inputDateText.equals("") || !inputOddsText.equals("")) {
+                            viewModel.setOddsData(inputOddsText!!, inputDateText!!, clickValue!!)
+                            navController.navigate(NavRoutes.OddsList.route)
+                        }else{
+                            Toast.makeText(
+                             context,
+                            "Please fill required fields",
+                            Toast.LENGTH_LONG).show()
+                        }
+
                     },
                     backgroundColor = colorResource(id = R.color.button_background),
                     content = {
@@ -64,13 +92,17 @@ class AddOddsActivity : AppCompatActivity() {
                         )
                     }
                 )
+
             },
             content = {
-                Surface(modifier = Modifier.padding(24.dp)) {
-                    var textData: String
+                Surface(modifier = Modifier.padding(8.dp)) {
+
                     //form content
                     Column(Modifier.fillMaxWidth()) {
-                        Row(Modifier.fillMaxWidth()) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp, 8.dp)) {
                             MyEditTextView()
                         }
                         var datePicked: String? by remember {
@@ -80,8 +112,38 @@ class AddOddsActivity : AppCompatActivity() {
                             datePicked = dateFormater(date)
                             inputDateText = datePicked
                         }
-                        Row() {
+                        Row(Modifier.padding(0.dp,8.dp)) {
                             MyDatePickerView(datePicked = datePicked, updatedDate = updatedDate)
+
+                        }
+
+
+                        //passed or failed section
+                        Row(Modifier.fillMaxWidth()) {
+
+
+                            var onClickVal: Int? by remember{
+                                mutableStateOf(-1)
+                               }
+                            //assign to global var
+                            clickValue = onClickVal
+
+                            OutlinedButton(onClick = {
+                                onClickVal = onClickVal?.plus(1)
+                                if (onClickVal!! >1){
+                                    onClickVal = -1
+                                }
+
+                            }, Modifier.padding(0.dp,8.dp, 64.dp, 8.dp)){
+                                Text(text = stringResource(R.string.set_results), textAlign = TextAlign.Start,
+                                color = when(clickValue){
+                                    -1 -> colorResource(id = R.color.button_background)
+                                    0 -> Color.Red
+                                    1 -> Color.Green
+                                    else -> colorResource(id = R.color.button_background)
+                                })
+
+                            }
 
                         }
                     }
@@ -91,9 +153,21 @@ class AddOddsActivity : AppCompatActivity() {
         )
     }
 
-    fun saveData(datePicked: String?, myEditTextView: String) {
-        Log.i("TAG", "Data is -> $datePicked and $myEditTextView")
-    }
+//    @Composable
+//    fun MyCheckBox( checkVal: Boolean){
+//        val isChecked = remember { mutableStateOf(false)}
+//        isChecked.value = checkVal
+//        Checkbox(checked = isChecked.value, onCheckedChange = {
+//            isChecked.value = it
+//            if (isChecked.value) {
+//                clickValue = 1
+//            }else {
+//                clickValue = 0
+//            }
+//        })
+//    }
+
+
 
     //Edit Text Field
     @Composable
@@ -104,10 +178,11 @@ class AddOddsActivity : AppCompatActivity() {
             onValueChange = { nexText ->
                 text = nexText.trimEnd()
             },
-            label = { "Input Odds" }
+            label = { stringResource(R.string.input_odds) }
         )
         inputOddsText = text
     }
+
 
     //DatePicker
     @Composable
@@ -119,7 +194,7 @@ class AddOddsActivity : AppCompatActivity() {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .wrapContentSize(Alignment.TopStart)
                 .padding(top = 10.dp)
                 .border(0.5.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
@@ -136,14 +211,14 @@ class AddOddsActivity : AppCompatActivity() {
                     .padding(16.dp)
             ) {
 
-                val (lable, iconView) = createRefs()
+                val (label, iconView) = createRefs()
 
                 Text(
                     text = datePicked ?: "Date Picker",
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .constrainAs(lable) {
+                        .constrainAs(label) {
                             top.linkTo(parent.top)
                             bottom.linkTo(parent.bottom)
                             start.linkTo(parent.start)
@@ -170,13 +245,15 @@ class AddOddsActivity : AppCompatActivity() {
         }
     }
 
-    fun showDatePicker(activity: AppCompatActivity, updatedDate: (Long?) -> Unit) {
+
+
+    private fun showDatePicker(activity: AppCompatActivity, updatedDate: (Long?) -> Unit) {
         val picker = MaterialDatePicker.Builder.datePicker().build()
         picker.show(activity.supportFragmentManager, picker.toString())
         picker.addOnPositiveButtonClickListener { updatedDate(it) }
     }
 
-    fun dateFormater(milliseconds: Long?): String? {
+    private fun dateFormater(milliseconds: Long?): String? {
         milliseconds?.let {
             val formatter = SimpleDateFormat("EEE, d MMM yyyy", Locale.US)
             val calendar: Calendar = Calendar.getInstance()

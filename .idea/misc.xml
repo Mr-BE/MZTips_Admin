@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/MrBE/StudioProjects/MZTipsAdmin/app/src/main/res/font/arimo.xml" value="0.1" />
+        <entry key="..\:/Users/MrBE/StudioProjects/MZTipsAdmin/app/src/main/res/font/poppins_semibold.xml" value="0.12552083333333333" />
         <entry key="..\:/Users/MrBE/StudioProjects/MZTipsAdmin/app/src/main/res/layout/content_main.xml" value="0.20729166666666668" />
       </map>
     </option>

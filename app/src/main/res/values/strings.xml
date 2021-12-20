@@ -12,4 +12,6 @@
     <string name="title_activity_compose">ComposeActivity</string>
     <string name="odds_list">Odds List</string>
     <string name="add_odds">Add Odds</string>
+    <string name="input_odds">Input Odds</string>
+    <string name="set_results">Set Results</string>
 </resources>
