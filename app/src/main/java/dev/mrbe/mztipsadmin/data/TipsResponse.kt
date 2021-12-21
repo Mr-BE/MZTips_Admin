@@ -18,11 +18,10 @@ data class OnError(val exception: FirebaseFirestoreException?): TipsResponse()
 
 class OddsRepo {
     private val firestore = FirebaseFirestore.getInstance()
-    private val db = Firebase.firestore
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getTips() = callbackFlow {
-        val  collection = firestore.collection("odds")
+        val  collection = firestore.collection("newodds")
 
         val snapshotListener = collection.addSnapshotListener{ value, error ->
             val response = if (error == null) {
@@ -41,16 +40,6 @@ class OddsRepo {
         awaitClose { snapshotListener.remove() }
     }
 
-    fun addTips(odds: Odds){
-        db.collection("odds")
-            .add(odds)
-            .addOnSuccessListener { ref ->
-                Log.d("TAG", "doc added with id -> ${ref.id}")
-            }
-            .addOnFailureListener {
-                    ref ->
-                Log.d("TAG", "doc added with err -> $ref")
-            }
-    }
+
 
 }

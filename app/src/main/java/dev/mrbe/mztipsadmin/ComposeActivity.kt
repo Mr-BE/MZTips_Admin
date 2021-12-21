@@ -1,9 +1,11 @@
 package dev.mrbe.mztipsadmin
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +26,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -63,10 +66,23 @@ class ComposeActivity : AppCompatActivity() {
                        composable(NavRoutes.OddsList.route){
                            HomeContent(navController = navController)
                        }
+                       //Add screen
                        composable(NavRoutes.AddOdds.route){
+                           //extract args
+                           val receivedOdds = it.arguments?.getParcelable<Odds>("odds")
                            AddOddsActivity().AddOddsContent(
                                oddsViewModel, navController, context
                            )
+                       }
+                       //EditScreen
+                       composable(NavRoutes.Details.route) {
+                           //extract args
+                           val receivedOdds = it.arguments?.getParcelable<Odds>(getString(R.string.odds_parcelable_key))
+                           if (receivedOdds != null) {
+                               OddsDetailsActivity().OddsDetailsContent(receivedOdds = receivedOdds,
+                                   viewModel = oddsViewModel, navController = navController)
+                           }
+
                        }
                    }
 
@@ -86,7 +102,8 @@ fun HomeContent(
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.odds_list)) }, backgroundColor = colorResource(id = R.color.orange_500))
-        },
+        
+                 },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(NavRoutes.AddOdds.route) },
@@ -101,8 +118,8 @@ fun HomeContent(
             )
         },
         content = {
-            Surface(modifier = Modifier.padding(24.dp)) {
-                OddsList()
+            Surface(modifier = Modifier.padding(8.dp)) {
+                OddsList(navController)
             }
         }
     )
@@ -112,7 +129,7 @@ fun HomeContent(
 
     @Composable
     private fun OddsList(
-
+        navController: NavController,
         oddsViewModel: OddsViewModel = viewModel(modelClass = OddsViewModel::class.java,
             this, factory = OddsViewModelFactory(OddsRepo()))
     ) {
@@ -135,7 +152,17 @@ fun HomeContent(
                         Card(modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(4.dp)
                         ) {
-                            Row() {
+                            Row(Modifier.clickable { 
+                                
+                                //create a bundle with selected odds as arg
+                                val bundle = Bundle().apply { 
+                                    putParcelable("odds", item)
+                                }
+                                
+                                //set navigation 
+                                navController.navigate(NavRoutes.AddOdds.route, bundle)
+                            
+                            }) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
 
                                     Row(modifier = Modifier
@@ -188,6 +215,8 @@ fun HomeContent(
                     }
                 }
             }
+            else -> {
+                Log.wtf("Tag", "wtf  happened")}
         }
 
     }
@@ -198,17 +227,17 @@ fun HomeContent(
 
 
 ////Ext. fun. for navigating with just route and bundle
-//private fun NavController.navigate(
-//    route: String,
-//    args: Bundle?,
-//    navOptions: NavOptions? = null,
-//    navigatorExtras: Navigator.Extras? = null
-//) {
-//    val routeLink = NavDeepLinkRequest
-//        .Builder
-//        .fromUri(NavDestination.createRoute(route).toUri())
-//        .build()
-//
-//
-//        navigate(route, navOptions, navigatorExtras)
-//}
+private fun NavController.navigate(
+    route: String,
+    args: Bundle?,
+    navOptions: NavOptions? = null,
+    navigatorExtras: Navigator.Extras? = null
+) {
+    val routeLink = NavDeepLinkRequest
+        .Builder
+        .fromUri(NavDestination.createRoute(route).toUri())
+        .build()
+
+
+        navigate(route, navOptions, navigatorExtras)
+}
