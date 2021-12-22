@@ -101,18 +101,18 @@ fun HomeContent(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.odds_list)) }, backgroundColor = colorResource(id = R.color.orange_500))
+            TopAppBar(title = { Text(stringResource(R.string.odds_list)) }, backgroundColor = colorResource(id = R.color.amber_500))
         
                  },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(NavRoutes.AddOdds.route) },
-                backgroundColor = colorResource(id = R.color.button_background),
+                backgroundColor = colorResource(id = R.color.white),
                 content = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_add_24),
                         contentDescription = null,
-                        tint = colorResource(id = R.color.white)
+                        tint = colorResource(id = R.color.button_background)
                     )
                 }
             )

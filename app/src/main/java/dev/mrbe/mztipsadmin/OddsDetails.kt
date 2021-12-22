@@ -1,41 +1,30 @@
 package dev.mrbe.mztipsadmin
 
-import android.content.Context
-import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import com.google.android.material.datepicker.MaterialDatePicker
 import dev.mrbe.mztipsadmin.data.OddsViewModel
 import dev.mrbe.mztipsadmin.models.Odds
-import dev.mrbe.mztipsadmin.nav.NavRoutes
-import dev.mrbe.mztipsadmin.ui.theme.MZTipsAdminTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,12 +40,16 @@ class OddsDetailsActivity : ComponentActivity() {
         //pass object to view model
         viewModel.getReceivedOdds(receivedOdds)
 
+        inputOddsText = receivedOdds.oddsTip
+        inputDateText = receivedOdds.date
+        clickValue = receivedOdds.oddsResult
+
             Scaffold(
 
                 topBar = {
                     TopAppBar(
                         title = { Text(stringResource(R.string.add_odds)) },
-                        backgroundColor = colorResource(id = R.color.orange_500),
+                        backgroundColor = colorResource(id = R.color.amber_500),
                         actions = { IconButton(onClick = { /*TODO*/ }) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                             }
@@ -113,6 +106,8 @@ class OddsDetailsActivity : ComponentActivity() {
                                 }
                                 //assign to global var
                                 clickValue = onClickVal
+
+
 
                                 OutlinedButton(onClick = {
                                     onClickVal = onClickVal?.plus(1)

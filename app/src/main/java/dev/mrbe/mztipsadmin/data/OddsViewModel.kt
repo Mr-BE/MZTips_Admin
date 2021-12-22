@@ -27,11 +27,15 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
 
     private val _addOddText = MutableLiveData<String>()
 
-    private val _addResult = MutableLiveData<Int>()
+    private val _addResult = MutableLiveData<Int?>()
+    val addResult: LiveData<Int?>
+    get() = _addResult
+
 
 
     private val _viewModelOdds = MutableLiveData<Odds?>()
 
+    //received var (details)
     private val _receivedOdds = MutableLiveData<Odds?>()
     val receivedOdds: LiveData<Odds?>
     get() = _receivedOdds
@@ -116,6 +120,10 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
     }
     fun addResultValue(result: Int?) {
         _addResult.postValue(result)
+    }
+
+    fun increaseResultValue() {
+        if (_addResult.value!! > 1 ) _addResult.value = -1
     }
 
 }

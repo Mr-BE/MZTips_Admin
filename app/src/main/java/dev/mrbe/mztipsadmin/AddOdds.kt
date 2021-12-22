@@ -1,7 +1,6 @@
 package dev.mrbe.mztipsadmin
 
 import android.content.Context
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,8 +30,6 @@ import java.util.*
 
 class AddOddsActivity : AppCompatActivity() {
 
-    private var clickValue: Int? = -1
-
     @Composable
     fun AddOddsContent(viewModel: OddsViewModel, navController: NavController,
     context: Context) {
@@ -40,7 +38,7 @@ class AddOddsActivity : AppCompatActivity() {
             topBar = {
                 TopAppBar(
                     title = { Text(stringResource(R.string.add_odds)) },
-                    backgroundColor = colorResource(id = R.color.orange_500),
+                    backgroundColor = colorResource(id = R.color.amber_500),
                 )
             },
             floatingActionButton = {
@@ -51,12 +49,12 @@ class AddOddsActivity : AppCompatActivity() {
                         navController.navigate(NavRoutes.OddsList.route)
 
                     },
-                    backgroundColor = colorResource(id = R.color.button_background),
+                    backgroundColor = colorResource(id = R.color.white),
                     content = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_baseline_save_24),
                             contentDescription = "Save button",
-                            tint = colorResource(id = R.color.white)
+                            tint = colorResource(id = R.color.button_background)
                         )
                     }
                 )
@@ -89,22 +87,29 @@ class AddOddsActivity : AppCompatActivity() {
                         //passed or failed section
                         Row(Modifier.fillMaxWidth()) {
 
+                           val resultLiveData by viewModel.addResult.observeAsState()
+
                             var onClickVal: Int? by remember{
-                                mutableStateOf(-1)
+                                mutableStateOf( -1)
                                }
 
 
+
                             OutlinedButton(onClick = {
-                                onClickVal = onClickVal?.plus(1)
-                                if (onClickVal!! >1){
-                                    onClickVal = -1
-                                    //assign to global var
-                                    viewModel.addResultValue(onClickVal)
+
+                                //control click value
+                                onClickVal = if (onClickVal!! <1 ){
+                                    onClickVal!!+ 1
+                                } else{
+                                    -1
                                 }
+
+                                viewModel.addResultValue(onClickVal)
 
                             }, Modifier.padding(0.dp,8.dp, 64.dp, 8.dp)){
                                 Text(text = stringResource(R.string.set_results), textAlign = TextAlign.Start,
-                                color = when(clickValue){
+                                    //set color based on click value
+                                color = when(onClickVal){
                                     -1 -> colorResource(id = R.color.button_background)
                                     0 -> Color.Red
                                     1 -> Color.Green

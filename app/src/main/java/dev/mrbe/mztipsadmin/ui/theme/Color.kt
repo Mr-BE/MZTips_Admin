@@ -1,8 +1,9 @@
 package dev.mrbe.mztipsadmin.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import dev.mrbe.mztipsadmin.R
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+val Amber200 = Color(R.color.amber_200)
+val Amber500 = Color(R.color.amber_500)
+val Amber700 = Color(R.color.amber_700)
+val Brown200 = Color(R.color.brown_200)
