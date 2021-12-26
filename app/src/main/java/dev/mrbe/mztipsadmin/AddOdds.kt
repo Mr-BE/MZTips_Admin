@@ -87,13 +87,9 @@ class AddOddsActivity : AppCompatActivity() {
                         //passed or failed section
                         Row(Modifier.fillMaxWidth()) {
 
-                           val resultLiveData by viewModel.addResult.observeAsState()
-
                             var onClickVal: Int? by remember{
                                 mutableStateOf( -1)
                                }
-
-
 
                             OutlinedButton(onClick = {
 

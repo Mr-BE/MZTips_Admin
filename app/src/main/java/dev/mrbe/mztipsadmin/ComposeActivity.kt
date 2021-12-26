@@ -1,5 +1,6 @@
 package dev.mrbe.mztipsadmin
 
+import TestLocation
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -68,20 +69,27 @@ class ComposeActivity : AppCompatActivity() {
                        }
                        //Add screen
                        composable(NavRoutes.AddOdds.route){
-                           //extract args
-                           val receivedOdds = it.arguments?.getParcelable<Odds>("odds")
                            AddOddsActivity().AddOddsContent(
                                oddsViewModel, navController, context
                            )
                        }
-                       //EditScreen
-                       composable(NavRoutes.Details.route) {
+                       //Edit Screen
+                       composable(NavRoutes.Details.route) {backStack->
                            //extract args
-                           val receivedOdds = it.arguments?.getParcelable<Odds>(getString(R.string.odds_parcelable_key))
+                           val receivedOdds = backStack.arguments?.getParcelable<Odds>(getString(R.string.odds_parcelable_key))
                            if (receivedOdds != null) {
                                OddsDetailsActivity().OddsDetailsContent(receivedOdds = receivedOdds,
                                    viewModel = oddsViewModel, navController = navController)
                            }
+
+                       }
+                       //Test
+
+                       composable(NavRoutes.Test.route) {
+                           //extract args
+
+                              TestLocation().TestLocation()
+
 
                        }
                    }
@@ -156,11 +164,15 @@ fun HomeContent(
                                 
                                 //create a bundle with selected odds as arg
                                 val bundle = Bundle().apply { 
-                                    putParcelable("odds", item)
+                                    putParcelable(getString(R.string.odds_parcelable_key), item)
                                 }
                                 
                                 //set navigation 
-                                navController.navigate(NavRoutes.AddOdds.route, bundle)
+                                navController.navigater(
+                                    route = NavRoutes.Details.route,
+                                    args = bundle
+                                )
+//                                navController.navigate(NavRoutes.Test.route, bundle)
                             
                             }) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -227,17 +239,23 @@ fun HomeContent(
 
 
 ////Ext. fun. for navigating with just route and bundle
-private fun NavController.navigate(
+private fun NavController.navigater(
     route: String,
-    args: Bundle?,
+    args: Bundle,
     navOptions: NavOptions? = null,
     navigatorExtras: Navigator.Extras? = null
-) {
+){
     val routeLink = NavDeepLinkRequest
         .Builder
         .fromUri(NavDestination.createRoute(route).toUri())
         .build()
 
-
+    val deepLinkMatch = graph.matchDeepLink(routeLink)
+    if (deepLinkMatch != null) {
+        val destination = deepLinkMatch.destination
+        val id = destination.id
+        navigate(id, args, navOptions, navigatorExtras)
+    } else {
         navigate(route, navOptions, navigatorExtras)
+    }
 }

@@ -17,21 +17,23 @@ data class OnError(val exception: FirebaseFirestoreException?): TipsResponse()
 
 
 class OddsRepo {
+    val myTag: String = "RepoTag"
+
     private val firestore = FirebaseFirestore.getInstance()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getTips() = callbackFlow {
-        val  collection = firestore.collection("newodds")
+        val  collection = firestore.collection("odds")
 
         val snapshotListener = collection.addSnapshotListener{ value, error ->
             val response = if (error == null) {
                 Log.d(
-                    "Tag",
-                    "Response is not error. No of documents received is -> ${value?.documents}"
+                    myTag,
+                    "Response is not error. No of documents received is -> ${value?.size()}"
                 )
                 OnSuccess(value)
             } else {
-                Log.d("TAg", "Response is error -> $error")
+                Log.d(myTag, "Response is error -> $error")
                 OnError(error)
             }
 

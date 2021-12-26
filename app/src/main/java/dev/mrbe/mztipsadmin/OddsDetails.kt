@@ -1,5 +1,6 @@
 package dev.mrbe.mztipsadmin
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.border
@@ -25,13 +26,14 @@ import androidx.navigation.NavController
 import com.google.android.material.datepicker.MaterialDatePicker
 import dev.mrbe.mztipsadmin.data.OddsViewModel
 import dev.mrbe.mztipsadmin.models.Odds
+import dev.mrbe.mztipsadmin.nav.NavRoutes
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OddsDetailsActivity : ComponentActivity() {
 
-    private var inputOddsText: String? = ""
-    private var inputDateText: String? = ""
+    private var editOddsText: String? = ""
+    private var editDateText: String? = ""
     private var clickValue: Int? = -1
 
     @Composable
@@ -39,18 +41,27 @@ class OddsDetailsActivity : ComponentActivity() {
                             navController: NavController, receivedOdds: Odds) {
         //pass object to view model
         viewModel.getReceivedOdds(receivedOdds)
+        Log.i("TAG", "received odds is $receivedOdds")
 
-        inputOddsText = receivedOdds.oddsTip
-        inputDateText = receivedOdds.date
+        editOddsText = receivedOdds.oddsTip
+        Log.i("TAG", "received odds tip is ${receivedOdds.oddsTip}")
+
+        editDateText = receivedOdds.date
+        Log.i("TAG", "received odds date is ${receivedOdds.date}")
+
         clickValue = receivedOdds.oddsResult
+        Log.i("TAG", "received odds result is ${receivedOdds.oddsResult}")
 
-            Scaffold(
+
+        Scaffold(
 
                 topBar = {
                     TopAppBar(
                         title = { Text(stringResource(R.string.add_odds)) },
                         backgroundColor = colorResource(id = R.color.amber_500),
-                        actions = { IconButton(onClick = { /*TODO*/ }) {
+                        actions = { IconButton(onClick = { viewModel.deleteData(receivedOdds.id)
+                            navController.navigate(NavRoutes.OddsList.route)
+                        }) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                             }
                         }
@@ -60,7 +71,8 @@ class OddsDetailsActivity : ComponentActivity() {
 
                     FloatingActionButton(
                         onClick = {
-                                  viewModel.updateDbValues()
+                            receivedOdds.id?.let { viewModel.updateDocumentId(it) }
+                            navController.navigate(NavRoutes.OddsList.route)
                         },
                         backgroundColor = colorResource(id = R.color.button_background),
                         content = {
@@ -82,14 +94,14 @@ class OddsDetailsActivity : ComponentActivity() {
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(0.dp, 8.dp)) {
-                                MyEditTextView()
+                                MyEditTextView(viewModel)
                             }
                             var datePicked: String? by remember {
                                 mutableStateOf(null)
                             }
                             val updatedDate = { date: Long? ->
                                 datePicked = dateFormater(date)
-                                inputDateText = datePicked
+                                editDateText = datePicked
                             }
                             Row(Modifier.padding(0.dp,8.dp)) {
                                 MyDatePickerView(datePicked = datePicked, updatedDate = updatedDate)
@@ -104,20 +116,19 @@ class OddsDetailsActivity : ComponentActivity() {
                                 var onClickVal: Int? by remember{
                                     mutableStateOf(-1)
                                 }
-                                //assign to global var
-                                clickValue = onClickVal
-
-
 
                                 OutlinedButton(onClick = {
-                                    onClickVal = onClickVal?.plus(1)
-                                    if (onClickVal!! >1){
-                                        onClickVal = -1
+                                    //control click value
+                                    onClickVal = if (onClickVal!! <1 ){
+                                        onClickVal!!+ 1
+                                    } else{
+                                        -1
                                     }
+                                    viewModel.addResultValue(onClickVal)
 
                                 }, Modifier.padding(0.dp,8.dp, 64.dp, 8.dp)){
                                     Text(text = stringResource(R.string.set_results), textAlign = TextAlign.Start,
-                                        color = when(clickValue){
+                                        color = when(onClickVal){
                                             -1 -> colorResource(id = R.color.button_background)
                                             0 -> Color.Red
                                             1 -> Color.Green
@@ -134,34 +145,21 @@ class OddsDetailsActivity : ComponentActivity() {
             )
         }
 
-//    @Composable
-//    fun MyCheckBox( checkVal: Boolean){
-//        val isChecked = remember { mutableStateOf(false)}
-//        isChecked.value = checkVal
-//        Checkbox(checked = isChecked.value, onCheckedChange = {
-//            isChecked.value = it
-//            if (isChecked.value) {
-//                clickValue = 1
-//            }else {
-//                clickValue = 0
-//            }
-//        })
-//    }
 
-
-
-        //Edit Text Field
+//        Edit Text Field
         @Composable
-        fun MyEditTextView() {
-            var text by remember { mutableStateOf("") }
+        fun MyEditTextView(viewModel: OddsViewModel) {
+            var text by remember { mutableStateOf(editOddsText) }
 
-            OutlinedTextField(value = text,
-                onValueChange = { nexText ->
-                    text = nexText.trimEnd()
-                },
-                label = { stringResource(R.string.input_odds) }
-            )
-            inputOddsText = text
+    text?.let {
+        OutlinedTextField(value = it,
+            onValueChange = { nexText ->
+                text = nexText.trimEnd()
+            },
+            label = { stringResource(R.string.input_odds) }
+        )
+    }
+    text?.let { viewModel.addOddsText(it) }
         }
 
 

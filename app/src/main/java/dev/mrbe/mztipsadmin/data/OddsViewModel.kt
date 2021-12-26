@@ -15,9 +15,11 @@ import kotlinx.coroutines.launch
 
 class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
 
+    val myTag: String = "MyTag"
+
     internal val oddsStateFlow = MutableStateFlow<TipsResponse?>(null)
     private val db = Firebase.firestore
-    private val dbCollection = db.collection("newodds")
+    private val dbCollection = db.collection("odds")
 
     private val _autoId = MutableLiveData<String>()
 
@@ -76,11 +78,11 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
                     .addOnSuccessListener { ref ->
                         _autoId.value =ref.id
 
-//                        updateDocumentId(ref.id)
-                        Log.d("TAG", "doc added with id -> ${ref.id}")
+                        updateDocumentId(ref.id)
+                        Log.d(myTag, "doc added with id -> ${ref.id}")
                     }
                     .addOnFailureListener { ref ->
-                        Log.d("TAG", "doc added with err -> $ref")
+                        Log.e(myTag, "doc added with err -> $ref")
                     }
                    .addOnCompleteListener {ref->
                     updateDocumentId(ref.result.id)
@@ -89,25 +91,21 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
 
         }
 
-    private fun updateDocumentId(id: String) {
+     fun updateDocumentId(id: String) {
+
+
         val data = hashMapOf(
             "id" to id,
             "date" to _addDateText.value,
             "oddsTip" to _addOddText.value,
             "oddsResult" to _addResult.value
         )
-        try {
-
 
             dbCollection.document(id)
                 .update(data as Map<String, Any>)
                 .addOnSuccessListener { listener ->
-                    Log.d("TAG", "Update  successful")
+                    Log.d(myTag, "Update  successful")
                 }
-
-        } catch (e: Exception) {
-            Log.d("TAG", "what is this? $e")
-        }
     }
 
 
@@ -122,9 +120,14 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
         _addResult.postValue(result)
     }
 
-    fun increaseResultValue() {
-        if (_addResult.value!! > 1 ) _addResult.value = -1
-    }
+    fun deleteData(id:String?) {
+        if (id != null) {
+            dbCollection.document(id)
+                .delete()
+                .addOnSuccessListener { Log.d(myTag, "Document deleted successfully") }
+                .addOnFailureListener { e -> Log.d(myTag, "could not delete document cos of -> $e") }
+        }
+        }
 
 }
 class OddsViewModelFactory(private val oddsRepo: OddsRepo) :
