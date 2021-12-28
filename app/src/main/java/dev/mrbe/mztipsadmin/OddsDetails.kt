@@ -1,6 +1,5 @@
 package dev.mrbe.mztipsadmin
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.border
@@ -41,17 +40,12 @@ class OddsDetailsActivity : ComponentActivity() {
                             navController: NavController, receivedOdds: Odds) {
         //pass object to view model
         viewModel.getReceivedOdds(receivedOdds)
-        Log.i("TAG", "received odds is $receivedOdds")
 
         editOddsText = receivedOdds.oddsTip
-        Log.i("TAG", "received odds tip is ${receivedOdds.oddsTip}")
 
         editDateText = receivedOdds.date
-        Log.i("TAG", "received odds date is ${receivedOdds.date}")
 
         clickValue = receivedOdds.oddsResult
-        Log.i("TAG", "received odds result is ${receivedOdds.oddsResult}")
-
 
         Scaffold(
 
@@ -71,7 +65,8 @@ class OddsDetailsActivity : ComponentActivity() {
 
                     FloatingActionButton(
                         onClick = {
-                            receivedOdds.id?.let { viewModel.updateDocumentId(it) }
+//                            receivedOdds.id?.let { viewModel.updateDocumentId(it) }
+                            viewModel.updateDbValues()
                             navController.navigate(NavRoutes.OddsList.route)
                         },
                         backgroundColor = colorResource(id = R.color.button_background),
@@ -97,17 +92,18 @@ class OddsDetailsActivity : ComponentActivity() {
                                 MyEditTextView(viewModel)
                             }
                             var datePicked: String? by remember {
-                                mutableStateOf(null)
+                                mutableStateOf(receivedOdds.date)
                             }
                             val updatedDate = { date: Long? ->
-                                datePicked = dateFormater(date)
+                                datePicked = dateFormatter(date)
                                 editDateText = datePicked
+                                //offload data to VM
+                                viewModel.editDateText(datePicked)
                             }
                             Row(Modifier.padding(0.dp,8.dp)) {
                                 MyDatePickerView(datePicked = datePicked, updatedDate = updatedDate)
 
                             }
-
 
                             var colorVal: Int?
                             //passed or failed section
@@ -127,10 +123,11 @@ class OddsDetailsActivity : ComponentActivity() {
                                     //control click value
                                     onClickVal = if (onClickVal!! < 1) {
                                         onClickVal!! + 1
-                                    } else{
+                                    } else {
                                         -1
                                     }
-                                    viewModel.addResultValue(onClickVal)
+//                                    viewModel.addResultValue(onClickVal)
+                                    viewModel.editResultValue(onClickVal)
 
                                 }, Modifier.padding(0.dp,8.dp, 64.dp, 8.dp)){
                                     Text(text = stringResource(R.string.set_results), textAlign = TextAlign.Start,
@@ -155,7 +152,7 @@ class OddsDetailsActivity : ComponentActivity() {
 //        Edit Text Field
         @Composable
         fun MyEditTextView(viewModel: OddsViewModel) {
-            var text by remember { mutableStateOf(editOddsText) }
+    var text by remember { mutableStateOf(editOddsText) }
 
     text?.let {
         OutlinedTextField(value = it,
@@ -165,8 +162,9 @@ class OddsDetailsActivity : ComponentActivity() {
             label = { stringResource(R.string.input_odds) }
         )
     }
-    text?.let { viewModel.addOddsText(it) }
-        }
+//    text?.let { viewModel.addOddsText(it) }
+    viewModel.editOddsText(text)
+}
 
 
         //DatePicker
@@ -231,20 +229,21 @@ class OddsDetailsActivity : ComponentActivity() {
         }
 
 
-
-        private fun showDatePicker(activity: AppCompatActivity, updatedDate: (Long?) -> Unit) {
-            val picker = MaterialDatePicker.Builder.datePicker().build()
-            picker.show(activity.supportFragmentManager, picker.toString())
-            picker.addOnPositiveButtonClickListener { updatedDate(it) }
-        }
-
-        private fun dateFormater(milliseconds: Long?): String? {
-            milliseconds?.let {
-                val formatter = SimpleDateFormat("EEE, d MMM yyyy", Locale.US)
-                val calendar: Calendar = Calendar.getInstance()
-                calendar.timeInMillis = it
-                return formatter.format(calendar.time)
-            }
-            return null
-        }
+    private fun showDatePicker(activity: AppCompatActivity, updatedDate: (Long?) -> Unit) {
+        val picker = MaterialDatePicker.Builder.datePicker().build()
+        picker.show(activity.supportFragmentManager, picker.toString())
+        picker.addOnPositiveButtonClickListener { updatedDate(it) }
     }
+
+    private fun dateFormatter(milliseconds: Long?): String? {
+        var date: String? = ""
+        milliseconds?.let {
+            val formatter = SimpleDateFormat("EEE, d MMM yyyy", Locale.US)
+            val calendar: Calendar = Calendar.getInstance()
+            calendar.timeInMillis = it
+            date = formatter.format(calendar.time)
+            return formatter.format(calendar.time)
+        }
+        return date
+    }
+}

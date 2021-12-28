@@ -204,14 +204,14 @@ class AddOddsActivity : AppCompatActivity() {
 
     //Format date object to readable string
     private fun dateFormatter(milliseconds: Long?): String? {
-        var st = ""
+        var date = ""
         milliseconds?.let {
             val formatter = SimpleDateFormat("EEE, d MMM yyyy", Locale.US)
             val calendar: Calendar = Calendar.getInstance()
             calendar.timeInMillis = it
-            st = formatter.format(calendar.time)
-            return formatter.format(calendar.time)
+            date = formatter.format(calendar.time)
+            return date
         }
-        return st
+        return date
     }
 }
