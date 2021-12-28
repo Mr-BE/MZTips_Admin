@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -80,7 +79,6 @@ class AddOddsActivity : AppCompatActivity() {
                         }
                         Row(Modifier.padding(0.dp,8.dp)) {
                             MyDatePickerView(datePicked = datePicked, updatedDate = updatedDate)
-
                         }
 
 
@@ -94,9 +92,9 @@ class AddOddsActivity : AppCompatActivity() {
                             OutlinedButton(onClick = {
 
                                 //control click value
-                                onClickVal = if (onClickVal!! <1 ){
-                                    onClickVal!!+ 1
-                                } else{
+                                onClickVal = if (onClickVal!! < 1) {
+                                    onClickVal!! + 1
+                                } else {
                                     -1
                                 }
 
@@ -113,7 +111,6 @@ class AddOddsActivity : AppCompatActivity() {
                                 })
 
                             }
-
                         }
                     }
 
@@ -199,20 +196,23 @@ class AddOddsActivity : AppCompatActivity() {
     }
 
 
-
+    //Call android default date picker
     private fun showDatePicker(activity: AppCompatActivity, updatedDate: (Long?) -> Unit) {
         val picker = MaterialDatePicker.Builder.datePicker().build()
         picker.show(activity.supportFragmentManager, picker.toString())
         picker.addOnPositiveButtonClickListener { updatedDate(it) }
     }
 
+    //Format date object to readable string
     private fun dateFormater(milliseconds: Long?): String? {
+        var st = ""
         milliseconds?.let {
             val formatter = SimpleDateFormat("EEE, d MMM yyyy", Locale.US)
             val calendar: Calendar = Calendar.getInstance()
             calendar.timeInMillis = it
+            st = formatter.format(calendar.time)
             return formatter.format(calendar.time)
         }
-        return null
+        return st
     }
 }

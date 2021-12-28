@@ -109,18 +109,24 @@ class OddsDetailsActivity : ComponentActivity() {
                             }
 
 
+                            var colorVal: Int?
                             //passed or failed section
                             Row(Modifier.fillMaxWidth()) {
+                                colorVal = if (receivedOdds.oddsResult != -1) {
+                                    receivedOdds.oddsResult
+                                } else {
+                                    -1
+                                }
 
 
-                                var onClickVal: Int? by remember{
-                                    mutableStateOf(-1)
+                                var onClickVal: Int? by remember {
+                                    mutableStateOf(colorVal)
                                 }
 
                                 OutlinedButton(onClick = {
                                     //control click value
-                                    onClickVal = if (onClickVal!! <1 ){
-                                        onClickVal!!+ 1
+                                    onClickVal = if (onClickVal!! < 1) {
+                                        onClickVal!! + 1
                                     } else{
                                         -1
                                     }

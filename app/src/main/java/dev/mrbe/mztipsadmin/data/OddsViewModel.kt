@@ -2,7 +2,6 @@ package dev.mrbe.mztipsadmin.data
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dev.mrbe.mztips.data.OddsRepo
@@ -117,7 +116,7 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
         _addOddText.postValue(oddsText)
     }
     fun addResultValue(result: Int?) {
-        _addResult.postValue(result)
+        _addResult.value = result
     }
 
     fun deleteData(id:String?) {

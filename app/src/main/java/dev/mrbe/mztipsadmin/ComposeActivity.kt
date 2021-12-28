@@ -1,6 +1,5 @@
 package dev.mrbe.mztipsadmin
 
-import TestLocation
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -36,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import dev.mrbe.mztips.data.OddsRepo
 import dev.mrbe.mztips.data.OnError
 import dev.mrbe.mztips.data.OnSuccess
+import dev.mrbe.mztips.data.TipsResponse
 import dev.mrbe.mztipsadmin.data.OddsViewModel
 import dev.mrbe.mztipsadmin.data.OddsViewModelFactory
 import dev.mrbe.mztipsadmin.models.Odds
@@ -44,7 +44,6 @@ import dev.mrbe.mztipsadmin.ui.theme.MZTipsAdminTheme
 import kotlinx.coroutines.flow.asStateFlow
 
 class ComposeActivity : AppCompatActivity() {
-    private lateinit var viewModel: OddsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +57,7 @@ class ComposeActivity : AppCompatActivity() {
                    )
                     val context = this.applicationContext
 
-                    //set
+                    //set navigator
                     val navController = rememberNavController()
 
                    NavHost(navController = navController,
@@ -83,17 +82,7 @@ class ComposeActivity : AppCompatActivity() {
                            }
 
                        }
-                       //Test
-
-                       composable(NavRoutes.Test.route) {
-                           //extract args
-
-                              TestLocation().TestLocation()
-
-
-                       }
                    }
-
                     }
                 }
             }
@@ -109,9 +98,11 @@ fun HomeContent(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.odds_list)) }, backgroundColor = colorResource(id = R.color.amber_500))
-        
-                 },
+            TopAppBar(
+                title = { Text(stringResource(R.string.odds_list)) },
+                backgroundColor = colorResource(id = R.color.amber_500)
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(NavRoutes.AddOdds.route) },
@@ -119,7 +110,7 @@ fun HomeContent(
                 content = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_add_24),
-                        contentDescription = null,
+                        contentDescription = "add button",
                         tint = colorResource(id = R.color.button_background)
                     )
                 }
@@ -143,7 +134,7 @@ fun HomeContent(
     ) {
         val arimoFont = Font(R.font.arimo)
 
-        when (val oddsList = oddsViewModel
+        when (val oddsList: TipsResponse? = oddsViewModel
             .oddsStateFlow.asStateFlow().collectAsState().value) {
 
             is OnError -> {
@@ -153,7 +144,7 @@ fun HomeContent(
                 val listOfOdds = oddsList.querySnapshot?.toObjects(Odds::class.java)
                 listOfOdds?.let {
                     //load list
-                    LazyColumn{
+                    LazyColumn {
                         items(listOfOdds){item: Odds? ->
 
                         //Items
@@ -194,7 +185,6 @@ fun HomeContent(
                                                    )
                                                }
                                            }
-
                                        }
                                     }
                                     Row(modifier = Modifier
@@ -216,14 +206,10 @@ fun HomeContent(
                                             }
                                         }
                                     }
-
                                 }
-
                             }
-
                         }
                         }
-
                     }
                 }
             }
@@ -233,10 +219,6 @@ fun HomeContent(
 
     }
 }
-
-
-
-
 
 ////Ext. fun. for navigating with just route and bundle
 private fun NavController.navigater(
