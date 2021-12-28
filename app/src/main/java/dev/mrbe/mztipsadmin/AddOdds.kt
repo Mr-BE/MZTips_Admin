@@ -74,13 +74,12 @@ class AddOddsActivity : AppCompatActivity() {
                             mutableStateOf("")
                         }
                         val updatedDate = { date: Long? ->
-                            datePicked = dateFormater(date)
+                            datePicked = dateFormatter(date)
                             viewModel.addDateText( datePicked)
                         }
                         Row(Modifier.padding(0.dp,8.dp)) {
                             MyDatePickerView(datePicked = datePicked, updatedDate = updatedDate)
                         }
-
 
                         //passed or failed section
                         Row(Modifier.fillMaxWidth()) {
@@ -204,7 +203,7 @@ class AddOddsActivity : AppCompatActivity() {
     }
 
     //Format date object to readable string
-    private fun dateFormater(milliseconds: Long?): String? {
+    private fun dateFormatter(milliseconds: Long?): String? {
         var st = ""
         milliseconds?.let {
             val formatter = SimpleDateFormat("EEE, d MMM yyyy", Locale.US)
