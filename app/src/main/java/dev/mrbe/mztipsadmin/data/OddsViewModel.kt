@@ -1,6 +1,5 @@
 package dev.mrbe.mztipsadmin.data
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -17,14 +16,9 @@ import kotlinx.coroutines.launch
 
 class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
 
-    val myTag: String = "MyTag"
-
     internal val oddsStateFlow = MutableStateFlow<TipsResponse?>(null)
     private val db = Firebase.firestore
     private val dbCollection = db.collection("odds")
-
-    private val _autoId = MutableLiveData<String>()
-
 
     //add var
     private val _addDateText = MutableLiveData<String>()
@@ -32,13 +26,6 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
     private val _addOddText = MutableLiveData<String>()
 
     private val _addResult = MutableLiveData<Int?>()
-
-    //edit vars
-    private val _editDateText = MutableLiveData<String>()
-
-    private val _editOddText = MutableLiveData<String>()
-
-    private val _editResult = MutableLiveData<Int?>()
 
     private val _viewModelOdds = MutableLiveData<Odds?>()
 
@@ -78,39 +65,15 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
 
             _viewModelOdds.value?.let {
                dbCollection
-                    .add(it)
-                    .addOnSuccessListener { ref ->
-                        _autoId.value =ref.id
-
-                        updateDocumentId(ref.id)
-                        Log.d(myTag, "doc added with id -> ${ref.id}")
-                    }
-                    .addOnFailureListener { ref ->
-                        Log.e(myTag, "doc added with err -> $ref")
-                    }
-                   .addOnCompleteListener {ref->
-                    updateDocumentId(ref.result.id)
+                   .add(it)
+                   .addOnSuccessListener { docRef ->
+                       val docId = docRef.id
+                       val document = dbCollection.document(docId)
+                       document.update("id", docId)
                    }
             }
 
         }
-
-     fun updateDocumentId(id: String) {
-
-
-        val data = hashMapOf(
-            "id" to id,
-            "date" to _addDateText.value,
-            "oddsTip" to _addOddText.value,
-            "oddsResult" to _addResult.value
-        )
-
-            dbCollection.document(id)
-                .update(data as Map<String, Any>)
-                .addOnSuccessListener { listener ->
-                    Log.d(myTag, "Update  successful")
-                }
-    }
 
 
     //update add vars
@@ -126,7 +89,7 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
         _addResult.value = result
     }
 
-    //update details vars
+    /** update details vars */
     fun editDateText(dateText: String?) {
         if (dateText != null) {
             _receivedOdds.value?.date = dateText
@@ -149,17 +112,10 @@ class OddsViewModel (val oddsRepo: OddsRepo):ViewModel() {
         if (id != null) {
             dbCollection.document(id)
                 .delete()
-                .addOnSuccessListener { Log.d(myTag, "Document deleted successfully") }
-                .addOnFailureListener { e ->
-                    Log.d(
-                        myTag,
-                        "could not delete document cos of -> $e"
-                    )
-                }
         }
     }
-
 }
+
 class OddsViewModelFactory(private val oddsRepo: OddsRepo) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -168,6 +124,5 @@ class OddsViewModelFactory(private val oddsRepo: OddsRepo) :
         }
         throw IllegalStateException()
     }
-
     }
 

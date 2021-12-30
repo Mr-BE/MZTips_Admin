@@ -159,7 +159,7 @@ fun HomeContent(
                                 }
                                 
                                 //set navigation 
-                                navController.navigater(
+                                navController.navigator(
                                     route = NavRoutes.Details.route,
                                     args = bundle
                                 )
@@ -221,12 +221,12 @@ fun HomeContent(
 }
 
 ////Ext. fun. for navigating with just route and bundle
-private fun NavController.navigater(
+private fun NavController.navigator(
     route: String,
     args: Bundle,
     navOptions: NavOptions? = null,
     navigatorExtras: Navigator.Extras? = null
-){
+) {
     val routeLink = NavDeepLinkRequest
         .Builder
         .fromUri(NavDestination.createRoute(route).toUri())

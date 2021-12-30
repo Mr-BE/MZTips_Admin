@@ -57,8 +57,8 @@ class AddOddsActivity : AppCompatActivity() {
                         )
                     }
                 )
-
             },
+
             content = {
                 Surface(modifier = Modifier.padding(8.dp)) {
 
@@ -108,7 +108,6 @@ class AddOddsActivity : AppCompatActivity() {
                                     1 -> Color.Green
                                     else -> colorResource(id = R.color.button_background)
                                 })
-
                             }
                         }
                     }

@@ -1,12 +1,8 @@
 package dev.mrbe.mztips.data
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import dev.mrbe.mztipsadmin.models.Odds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -17,7 +13,6 @@ data class OnError(val exception: FirebaseFirestoreException?): TipsResponse()
 
 
 class OddsRepo {
-    val myTag: String = "RepoTag"
 
     private val firestore = FirebaseFirestore.getInstance()
 
@@ -27,13 +22,8 @@ class OddsRepo {
 
         val snapshotListener = collection.addSnapshotListener{ value, error ->
             val response = if (error == null) {
-                Log.d(
-                    myTag,
-                    "Response is not error. No of documents received is -> ${value?.size()}"
-                )
                 OnSuccess(value)
             } else {
-                Log.d(myTag, "Response is error -> $error")
                 OnError(error)
             }
 
@@ -41,7 +31,4 @@ class OddsRepo {
         }
         awaitClose { snapshotListener.remove() }
     }
-
-
-
 }
